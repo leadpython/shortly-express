@@ -80,6 +80,19 @@ app.get('/login', function(req, res) {
   res.render('login');
 });
 
+app.post('/login', function(req, res) {
+  var userInformation = req.body;
+  new User({username: userInformation.username, password: userInformation.password}).fetch().then(function(found) {
+    if (found) {
+      console.log('user found');
+      res.send(200, found.attributes);
+    } else {
+      console.log('user not found');
+      res.render('login');
+    }
+  })
+});
+
 app.get('/signup', function(req, res) {
   res.render('signup');
 });
