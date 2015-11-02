@@ -80,6 +80,28 @@ app.get('/login', function(req, res) {
   res.render('login');
 });
 
+app.get('/signup', function(req, res) {
+  res.render('signup');
+});
+
+app.post('/signup', function(req, res) {
+  var userInformation = req.body;
+
+  new User({username: userInformation.username}).fetch().then(function(found) {
+    if (found) {
+      console.log('new user found');
+      res.send(200, found.attributes);
+    } else {
+      Users.create({
+        username: userInformation.username,
+        password: userInformation.password
+      }).then(function(newUser) {
+        console.log('new user created');
+        res.send(200, newUser);
+      })
+    }
+  }) 
+});
 
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
