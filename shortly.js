@@ -113,8 +113,7 @@ app.post('/signup', function(req, res) {
       res.send(200, found.attributes);
     } else {
       var salt = bcrypt.genSaltSync(10);
-      var hash = bcrypt.hash(password, salt);
-
+      var hash = bcrypt.hashSync(password + salt, "");
       Users.create({
         username: userInformation.username,
         password: hash,
