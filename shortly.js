@@ -83,9 +83,12 @@ app.get('/login', function(req, res) {
 
 app.post('/login', function(req, res) {
   var userInformation = req.body;
-  new User({username: userInformation.username, password: userInformation.password}).fetch().then(function(found) {
+  new User({username: userInformation.username}).fetch().then(function(found) {
     if (found) {
       console.log('user found');
+      // bcryrpt.compareSync(use)
+      var bool = bcrypt.compareSync(userInformation.password, found.attributes.password);
+      console.log(bool);
       res.send(200, found.attributes);
     } else {
       console.log('user not found');
@@ -101,41 +104,20 @@ app.get('/signup', function(req, res) {
 app.post('/signup', function(req, res) {
   var userInformation = req.body;
   var password = userInformation.password;
-  // var salt = bcrypt.genSaltSync(10);
-  // var hashedPassword = bcrypt.hashSync(userInformation.password, salt);
-  // console.log(salt);
-  // console.log(userInformation);
-  // console.log(hashedPassword);
 
   new User({username: userInformation.username}).fetch().then(function(found) {
     if (found) {
-      console.log('new user found');
       res.send(200, found.attributes);
     } else {
       var salt = bcrypt.genSaltSync(10);
-      var hash = bcrypt.hashSync(password + salt, "");
+      var hash = bcrypt.hashSync(password, salt);
+
       Users.create({
         username: userInformation.username,
-        password: hash,
-        salt: salt
+        password: hash
       }).then(function(newUser) {
         res.send(200, newUser);
       });
-      // bcrypt.genSalt(10, function(err, salt) {
-      //   bcrypt.hash(password, salt, function(err, hashedPassword){
-      //     if (err) {
-      //       console.log('hash error');
-      //     }
-      //     Users.create({
-      //       username: userInformation.username,
-      //       password: hashedPassword,
-      //       salt: salt
-      //     }).then(function(newUser) {
-      //       console.log('new user created');
-      //       res.send(200, newUser);
-      //     });
-      //   });
-      // });
     }
   }); 
 });
