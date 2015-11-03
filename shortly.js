@@ -112,29 +112,33 @@ app.post('/signup', function(req, res) {
       console.log('new user found');
       res.send(200, found.attributes);
     } else {
-      bcrypt.genSalt(10, function(err, salt) {
-        bcrypt.hash(password, salt, function(err, hashedPassword){
-          if (err) { console.log('hash error');}
-          Users.create({
-            username: userInformation.username,
-            password: hashedPassword,
-            salt: salt
-          }).then(function(newUser) {
-            console.log('new user created');
-            res.send(200, newUser);
-          });
-        });
+      var salt = bcrypt.genSaltSync(10);
+      var hash = bcrypt.hash(password, salt);
+
+      Users.create({
+        username: userInformation.username,
+        password: hash,
+        salt: salt
+      }).then(function(newUser) {
+        res.send(200, newUser);
       });
-    //   Users.create({
-    //     username: userInformation.username,
-    //     password: hashedPassword,
-    //     salt: salt
-    //   }).then(function(newUser) {
-    //     console.log('new user created');
-    //     res.send(200, newUser);
-    //   })
+      // bcrypt.genSalt(10, function(err, salt) {
+      //   bcrypt.hash(password, salt, function(err, hashedPassword){
+      //     if (err) {
+      //       console.log('hash error');
+      //     }
+      //     Users.create({
+      //       username: userInformation.username,
+      //       password: hashedPassword,
+      //       salt: salt
+      //     }).then(function(newUser) {
+      //       console.log('new user created');
+      //       res.send(200, newUser);
+      //     });
+      //   });
+      // });
     }
-  }) 
+  }); 
 });
 
 /************************************************************/
