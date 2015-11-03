@@ -2,6 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt-nodejs');
 
 
 var db = require('./app/config');
@@ -99,19 +100,39 @@ app.get('/signup', function(req, res) {
 
 app.post('/signup', function(req, res) {
   var userInformation = req.body;
+  var password = userInformation.password;
+  // var salt = bcrypt.genSaltSync(10);
+  // var hashedPassword = bcrypt.hashSync(userInformation.password, salt);
+  // console.log(salt);
+  // console.log(userInformation);
+  // console.log(hashedPassword);
 
   new User({username: userInformation.username}).fetch().then(function(found) {
     if (found) {
       console.log('new user found');
       res.send(200, found.attributes);
     } else {
-      Users.create({
-        username: userInformation.username,
-        password: userInformation.password
-      }).then(function(newUser) {
-        console.log('new user created');
-        res.send(200, newUser);
-      })
+      bcrypt.genSalt(10, function(err, salt) {
+        bcrypt.hash(password, salt, function(err, hashedPassword){
+          if (err) { console.log('hash error');}
+          Users.create({
+            username: userInformation.username,
+            password: hashedPassword,
+            salt: salt
+          }).then(function(newUser) {
+            console.log('new user created');
+            res.send(200, newUser);
+          });
+        });
+      });
+    //   Users.create({
+    //     username: userInformation.username,
+    //     password: hashedPassword,
+    //     salt: salt
+    //   }).then(function(newUser) {
+    //     console.log('new user created');
+    //     res.send(200, newUser);
+    //   })
     }
   }) 
 });
