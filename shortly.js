@@ -3,6 +3,7 @@ var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
+var session = require('express-session');
 
 
 var db = require('./app/config');
@@ -22,6 +23,10 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
+
+app.use(session({
+  secret: "abcd"
+}));
 
 
 app.get('/', 
@@ -77,6 +82,7 @@ function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 
+
 app.get('/login', function(req, res) {
   res.render('login');
 });
@@ -86,15 +92,25 @@ app.post('/login', function(req, res) {
   new User({username: userInformation.username}).fetch().then(function(found) {
     if (found) {
       console.log('user found');
-      // bcryrpt.compareSync(use)
       var bool = bcrypt.compareSync(userInformation.password, found.attributes.password);
-      console.log(bool);
-      res.send(200, found.attributes);
+      if (bool) {
+        req.session.
+        res.send(200, found.attributes);
+      } else {
+        console.log("Wrong username or password!");
+      }
+      
     } else {
       console.log('user not found');
       res.render('login');
     }
   })
+});
+
+app.get('/logout', function(req, res) {
+  req.session.destroy(function() {
+    res.redirect('/');
+  });
 });
 
 app.get('/signup', function(req, res) {
