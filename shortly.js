@@ -120,7 +120,7 @@ app.post('/signup', function(req, res) {
 
   new User({username: userInformation.username}).fetch().then(function(found) {
     if (found) {
-      res.send(200, found.attributes);
+      res.send(200, "USERNAME ALREADY TAKEN!!!");
     } else {
       var salt = bcrypt.genSaltSync(10);
       var hash = bcrypt.hashSync(password, salt);
