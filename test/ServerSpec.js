@@ -13,7 +13,14 @@ var Link = require('../app/models/link');
 // Remove the 'x' from beforeEach block when working on
 // authentication tests.
 /************************************************************/
-var beforeEach = function(){};
+var xbeforeEach = function(arg1, arg2){
+  if (typeof arg1 === 'function') {
+    arg1();
+  } else {
+    console.log(arg1);
+    arg2();
+  }
+};
 /************************************************************/
 
 
@@ -40,10 +47,12 @@ describe('', function() {
       .del()
       .catch(function(error) {
         // uncomment when writing authentication tests
-        // throw {
-        //   type: 'DatabaseError',
-        //   message: 'Failed to create test setup data'
-        // };
+        if (error) {
+          throw {
+            type: 'DatabaseError',
+            message: 'Failed to create test setup data'
+          };
+        }
       });
 
     // delete user Phillip from db so it can be created later for the test
@@ -52,10 +61,12 @@ describe('', function() {
       .del()
       .catch(function(error) {
         // uncomment when writing authentication tests
-        // throw {
-        //   type: 'DatabaseError',
-        //   message: 'Failed to create test setup data'
-        // };
+        if (error) {
+          throw {
+            type: 'DatabaseError',
+            message: 'Failed to create test setup data'
+          };
+        }
       });
   });
 
@@ -154,8 +165,11 @@ describe('', function() {
 
       var link;
 
+      console.log("WE ARE HERE");
+
       beforeEach(function(done){
         // save a link to the database
+        console.log("WE GOT INTO BEFORE EACH");
         link = new Link({
           url: 'http://roflzoo.com/',
           title: 'Funny pictures of animals, funny dog pictures',

@@ -29,8 +29,7 @@ app.use(session({
 }));
 
 
-app.get('/', 
-function(req, res) {
+app.get('/', util.checkUser, function(req, res) {
   res.render('index');
 });
 
@@ -39,15 +38,14 @@ function(req, res) {
   res.render('index');
 });
 
-app.get('/links', 
+app.get('/links',
 function(req, res) {
   Links.reset().fetch().then(function(links) {
     res.send(200, links.models);
   });
 });
 
-app.post('/links', 
-function(req, res) {
+app.post('/links', util.checkUser, function(req, res) {
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
@@ -91,17 +89,16 @@ app.post('/login', function(req, res) {
   var userInformation = req.body;
   new User({username: userInformation.username}).fetch().then(function(found) {
     if (found) {
-      console.log('user found');
       var bool = bcrypt.compareSync(userInformation.password, found.attributes.password);
       if (bool) {
-        req.session.
-        res.send(200, found.attributes);
+        util.createSession(req, res, found);
+        // res.send(200, found.attributes);
       } else {
         console.log("Wrong username or password!");
+        res.redirect('/login');
       }
       
     } else {
-      console.log('user not found');
       res.render('login');
     }
   })
