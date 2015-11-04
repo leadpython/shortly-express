@@ -129,7 +129,8 @@ app.post('/signup', function(req, res) {
         username: userInformation.username,
         password: hash
       }).then(function(newUser) {
-        res.send(200, newUser);
+        util.createSession(req, res, newUser);
+        // res.send(200, newUser);
       });
     }
   }); 
